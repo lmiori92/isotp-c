@@ -9,6 +9,9 @@
 extern "C" {
 #endif
 
+/** If defined, perform read-only ISO-TP receving of messages */
+#define MULTI_FRAME_DISABLE_FLOW_OF_CONTROL
+
 /* Public: A handle for beginning and continuing receiving a single ISO-TP
  * message - both single and multi-frame.
  *

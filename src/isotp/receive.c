@@ -126,7 +126,9 @@ IsoTpMessage isotp_continue_receive(IsoTpShims* shims,
             message.multi_frame = true;
             handle->success = false;
             handle->completed = false;
+#ifndef MULTI_FRAME_DISABLE_FLOW_OF_CONTROL
             isotp_send_flow_control_frame(shims, &message);
+#endif
             break;
         }
         case PCI_CONSECUTIVE_FRAME: {
