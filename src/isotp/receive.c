@@ -49,6 +49,14 @@ IsoTpReceiveHandle isotp_receive(IsoTpShims* shims,
     return handle;
 }
 
+#ifndef USE_DYNAMIC_ALLOCATION
+void isotp_set_receive_buffer(IsoTpReceiveHandle *handle, uint8_t *buffer)
+{
+    if (handle != NULL)
+        handle->receive_buffer = buffer;
+}
+#endif
+
 IsoTpMessage isotp_continue_receive(IsoTpShims* shims,
         IsoTpReceiveHandle* handle, const uint32_t arbitration_id,
         const uint8_t data[], const uint8_t size) {
@@ -111,8 +119,11 @@ IsoTpMessage isotp_continue_receive(IsoTpShims* shims,
             //messages. That way we don't have to allocate 4k of memory 
             //for each multi-frame response.
             uint8_t* combined_payload = NULL;
+#ifdef USE_DYNAMIC_ALLOCATION
             combined_payload = (uint8_t*)malloc(sizeof(uint8_t)*payload_length);
-
+#else
+            combined_payload = handle->receive_buffer;
+#endif
             if(combined_payload == NULL) {
                 shims->log("Unable to allocate memory for multi-frame response.");
                 break;
@@ -144,12 +155,16 @@ IsoTpMessage isotp_continue_receive(IsoTpShims* shims,
                 handle->received_buffer_size = start_index + remaining_bytes;
 
                 if(handle->received_buffer_size != handle->incoming_message_size){
+#ifdef USE_DYNAMIC_ALLOCATION
                     free(handle->receive_buffer);
+#endif
                     handle->success = false;
                     shims->log("Error capturing all bytes of multi-frame. Freeing memory.");
                 } else {
                     memcpy(message.payload,&handle->receive_buffer[0],handle->incoming_message_size);
+#ifdef USE_DYNAMIC_ALLOCATION
                     free(handle->receive_buffer);
+#endif
                     message.size = handle->incoming_message_size;
                     message.completed = true;
                     shims->log("Successfully captured all of multi-frame. Freeing memory.");

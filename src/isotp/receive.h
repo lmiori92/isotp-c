@@ -9,6 +9,9 @@
 extern "C" {
 #endif
 
+/** If defined, use malloc/free calls to allocate receiving buffer.
+ * Otherwise, the user has to provide a suitable buffer */
+/* #define USE_DYNAMIC_ALLOCATION */
 /** If defined, perform read-only ISO-TP receving of messages */
 #define MULTI_FRAME_DISABLE_FLOW_OF_CONTROL
 
@@ -37,6 +40,15 @@ typedef struct {
     uint16_t incoming_message_size;
     // TODO timer callback for multi frame
 } IsoTpReceiveHandle;
+
+#ifndef USE_DYNAMIC_ALLOCATION
+/* Public: Provide the buffer to receive the incoming data, if dynamic memory
+ * allocation is disabled.
+ * This shall be called before continuing the reception of a message i.e.
+ * immediately after the call to isotp_receive.
+ */
+void isotp_set_receive_buffer(IsoTpReceiveHandle *handle, uint8_t *buffer);
+#endif
 
 /* Public: Initiate receiving a single ISO-TP message on a particular
  * arbitration ID.
