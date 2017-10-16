@@ -64,7 +64,7 @@ IsoTpMessage isotp_continue_receive(IsoTpShims* shims,
         arbitration_id: arbitration_id,
         completed: false,
         multi_frame: false,
-        payload: {0},
+        payload: handle->receive_buffer,
         size: 0
     };
 
@@ -161,7 +161,8 @@ IsoTpMessage isotp_continue_receive(IsoTpShims* shims,
                     handle->success = false;
                     shims->log("Error capturing all bytes of multi-frame. Freeing memory.");
                 } else {
-                    memcpy(message.payload,&handle->receive_buffer[0],handle->incoming_message_size);
+                    /* LMO 11.10.2017 don't need to copy myself ... */
+                    /* memcpy(message.payload,&handle->receive_buffer[0],handle->incoming_message_size); */
 #ifdef USE_DYNAMIC_ALLOCATION
                     free(handle->receive_buffer);
 #endif

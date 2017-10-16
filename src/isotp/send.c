@@ -102,7 +102,8 @@ IsoTpSendHandle isotp_send(IsoTpShims* shims, const uint16_t arbitration_id,
     };
 
 	// copy the payload to the message
-    memcpy(message.payload, payload, size);
+    message.payload = payload;
+//    memcpy(message.payload, payload, size);
 	
 	// if we can fit entire payload onto one message, send single frame
     if(size < 8) {
