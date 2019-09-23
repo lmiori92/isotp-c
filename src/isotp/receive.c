@@ -27,7 +27,9 @@ bool isotp_send_flow_control_frame(IsoTpShims* shims, IsoTpMessage* message) {
     uint8_t can_data[CAN_MESSAGE_BYTE_SIZE] = {0};
 
     if(!set_nibble(PCI_NIBBLE_INDEX, PCI_FLOW_CONTROL_FRAME, can_data, sizeof(can_data))) {
+#ifdef DEBUG_ISOT_TP_ENABLED
         shims->log("Unable to set PCI in CAN data");
+#endif
         return false;
     }
 
@@ -111,7 +113,9 @@ IsoTpMessage isotp_continue_receive(IsoTpShims* shims,
             uint16_t payload_length = (get_nibble(data, size, 1) << 8) + get_byte(data, size, 1);
 
             if(payload_length > OUR_MAX_ISO_TP_MESSAGE_SIZE) {
+#ifdef DEBUG_ISOT_TP_ENABLED
                 shims->log("Multi-frame response too large for receive buffer.");
+#endif
                 break;
             }
 
@@ -125,7 +129,9 @@ IsoTpMessage isotp_continue_receive(IsoTpShims* shims,
             combined_payload = handle->receive_buffer;
 #endif
             if(combined_payload == NULL) {
+#ifdef DEBUG_ISOT_TP_ENABLED
                 shims->log("Unable to allocate memory for multi-frame response.");
+#endif
                 break;
             }
 
@@ -159,7 +165,9 @@ IsoTpMessage isotp_continue_receive(IsoTpShims* shims,
                     free(handle->receive_buffer);
 #endif
                     handle->success = false;
+#ifdef DEBUG_ISOT_TP_ENABLED
                     shims->log("Error capturing all bytes of multi-frame. Freeing memory.");
+#endif
                 } else {
                     /* LMO 11.10.2017 don't need to copy myself ... */
                     /* memcpy(message.payload,&handle->receive_buffer[0],handle->incoming_message_size); */
@@ -168,8 +176,9 @@ IsoTpMessage isotp_continue_receive(IsoTpShims* shims,
 #endif
                     message.size = handle->incoming_message_size;
                     message.completed = true;
+#ifdef DEBUG_ISOT_TP_ENABLED
                     shims->log("Successfully captured all of multi-frame. Freeing memory.");
-
+#endif
                     handle->success = true;
                     handle->completed = true;
                     isotp_handle_multi_frame(handle, &message);

@@ -29,14 +29,18 @@ IsoTpSendHandle isotp_send_single_frame(IsoTpShims* shims, IsoTpMessage* message
 	
 	// set nibble 0 = 0 to define message as single frame
     if(!set_nibble(PCI_NIBBLE_INDEX, PCI_SINGLE, can_data, sizeof(can_data))) {
+#ifdef DEBUG_ISOT_TP_ENABLED
         shims->log("Unable to set PCI in CAN data");
+#endif
         return handle;
     }
 
 	// set nibble 1 = can message length
     if(!set_nibble(PAYLOAD_LENGTH_NIBBLE_INDEX, message->size, can_data,
                 sizeof(can_data))) {
+#ifdef DEBUG_ISOT_TP_ENABLED
         shims->log("Unable to set payload length in CAN data");
+#endif
         return handle;
     }
 
@@ -68,13 +72,17 @@ IsoTpSendHandle isotp_send_multi_frame(IsoTpShims* shims, IsoTpMessage* message,
 	
 	// set nibble 0 = 1 to define message as first frame of multi-frame sequence
     if(!set_nibble(PCI_NIBBLE_INDEX, PCI_FIRST_FRAME, can_data, sizeof(can_data))) {
+#ifdef DEBUG_ISOT_TP_ENABLED
         shims->log("Unable to set PCI in first frame CAN data");
+#endif
         return handle;
     }
 
 	// define the total message size (note, now we have 3 nibbles instead of 1)
 	if(!set_bitfield(message->size,4,12,can_data,sizeof(can_data))){
+#ifdef DEBUG_ISOT_TP_ENABLED
         shims->log("Unable to set payload length in CAN data");
+#endif
         return handle;
     }		
 
@@ -121,13 +129,17 @@ bool isotp_send_second_frame(IsoTpShims* shims, uint16_t frame_count, uint8_t nu
 	
 	// set nibble 0 = 2 to define message as second frame of multi-frame sequence
     if(!set_nibble(PCI_NIBBLE_INDEX, PCI_CONSECUTIVE_FRAME, can_data, sizeof(can_data))) {
+#ifdef DEBUG_ISOT_TP_ENABLED
         shims->log("Unable to set PCI in second frame CAN data");
+#endif
         return false;
     }
 
 	// set nibble 1 to be second frame number of the sequence (i.e. second frame 1 out 3)
     if(!set_nibble(PAYLOAD_LENGTH_NIBBLE_INDEX, frame_count, can_data,sizeof(can_data))) {
+#ifdef DEBUG_ISOT_TP_ENABLED
         shims->log("Unable to set second frame number in CAN data");
+#endif
         return false;
     }
 

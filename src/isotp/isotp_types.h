@@ -12,6 +12,9 @@
 // here - for most multi-frame use cases, 256 bytes is plenty.
 #define OUR_MAX_ISO_TP_MESSAGE_SIZE     250
 
+/** Enable this define to have debug messages (~400bytes of message data) */
+/* #define DEBUG_ISOT_TP_ENABLED */
+
 /* Private: IsoTp nibble specifics for PCI and Payload.
  */
 #define PCI_NIBBLE_INDEX 0
